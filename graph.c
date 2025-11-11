@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "truck.h"
+#include "dijkstra.h"
 
 typedef struct location {
     int vertice;
@@ -37,7 +38,7 @@ void main() {
             printf("Enter the fill level (%%) of bin at %s -> ", location[i].name);
             scanf("%d", &bin[i].FullLevel);
         } else {
-            bin[i].FullLevel = 0;  // default value
+            bin[i].FullLevel = 0; 
         }
     }
 
@@ -84,31 +85,54 @@ void main() {
 
     printf("\n");
     
-    printf("\nDEBUG:1");
-    fflush(stdout);
-    
     truck arrTruck[truck_num];
-
-    printf("\nDEBUG:2");
-    fflush(stdout);
 
     initTruck(arrTruck, truck_num);
     
-    printf("\nDEBUG: 3");
-    fflush(stdout);
     displayTrucks(truck_num, arrTruck);
 
-    printf("DEBUG: 4");
-    fflush(stdout);
     printf("\n Enter the starting position from where u want to start sending Garbage Trucks : ");
     int startPosition;
     scanf("%d", &startPosition);
+    
     int truckNum = selectTruck(num, truck_num, arrTruck, bin);
     
-    printf("\n -----------TRUCK------------\n");
+    printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    printf("         TRUCK ASSIGNMENT\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
     if(truckNum != -1){
-        printf("Truck - %d is assigned to do the task for first round with Capacity - %d\n", truckNum + 1, arrTruck[truckNum].capacity); 
-    }else{
-        printf("\nNo Truck Can take the Load"); 
+        printf("✓ Truck-%d assigned for collection\n", truckNum + 1);
+        printf("  Capacity: %d units\n", arrTruck[truckNum].capacity);
+        printf("  Current Load: %d units\n", arrTruck[truckNum].currentLoad);
+    } else {
+        printf("✗ ERROR: No truck available with sufficient capacity!\n");
+        printf("  Total load exceeds maximum truck capacity.\n");
+        printf("  Please use multi-truck dispatch (Task 2).\n");
+        printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        return;
     }
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    //Greedy
+
+    int route[num];
+    int routeLen = 0;
+    int totalDist = 0;
+    
+    greedyCollectionRoute(num, adj, startPosition, bin, location, 
+                         route, &routeLen, &totalDist, 
+                         arrTruck[truckNum].capacity);
+
+    printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    printf("     SHORTEST DISTANCES FROM DEPOT (Reference)\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    int distance[num], parent[num];
+    dijkstra(num, adj, startPosition, distance, parent);
+    for(int i = 0 ; i < num; i++){
+        if(i != startPosition) {
+            printf("%s ➜ %-15s : %d km\n", 
+                   location[startPosition].name, location[i].name, distance[i]);
+        }
+    }
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 }

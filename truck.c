@@ -29,39 +29,51 @@ void heapify(truck arr[], int n, int i){
             heapify(arr, n, smallest);
         }
 }
-    void initTruck(truck arr[], int n){
-        int capacity[] = {25, 50, 75, 100};
-        for(int i = 0; i < n; i++){
-            arr[i].capacity = capacity[i];
-        }
 
-        minHeap(arr, n);
-
-        for(int i = 0; i < n; i++){
-            arr[i].currentLoad = 0;
-            arr[i].position = 0;
-        }
+void initTruck(truck arr[], int n){
+    int capacity[] = {75, 25, 100, 50};
+    for(int i = 0; i < n; i++){
+        arr[i].capacity = capacity[i];
     }
 
-    void displayTrucks(int n, truck arr[]){
-        printf("\n---------------TRUCK STATUS-------------\n");
-        for(int i = 0 ; i < n; i++){
-            printf(" Truck -> %d | Capacity -> %d | Load -> %d\n", i+1, arr[i].capacity, arr[i].currentLoad);
-        }
-    }
+    minHeap(arr, n);
 
-    int selectTruck(int num, int n, truck arr[], bin binArr[]){
-        int totalLoad = 0;
-        for(int  i = 0; i < num ; i++){
-            if(binArr[i].hasBin){
-                totalLoad += binArr[i].FullLevel;
-            }
-        }
-            for(int i = 0 ; i < n; i++){
-                if(arr[i].capacity >= totalLoad){
-                    int sendTruck = i;
-                    return sendTruck;
-                }
-            }
-            return -1; 
+    for(int i = 0; i < n; i++){
+        arr[i].currentLoad = 0;
+        arr[i].position = 0;
     }
+}
+
+void displayTrucks(int n, truck arr[]){
+    printf("\n---------------TRUCK STATUS-------------\n");
+    for(int i = 0 ; i < n; i++){
+        printf(" Truck -> %d | Capacity -> %d | Load -> %d\n", i+1, arr[i].capacity, arr[i].currentLoad);
+    }
+}
+
+int selectTruck(int num, int n, truck arr[], bin binArr[]){
+    int totalLoad = 0;
+    for(int i = 0; i < num; i++){
+        if(binArr[i].hasBin){
+            totalLoad += binArr[i].FullLevel;
+        }
+    }
+    
+    for(int i = 0; i < n; i++){
+        if(arr[i].capacity >= totalLoad){
+            return i;  
+        }
+    }
+    
+    int largestTruckIndex = 0;
+    int maxCapacity = arr[0].capacity;
+    
+    for(int i = 1; i < n; i++){
+        if(arr[i].capacity > maxCapacity){
+            maxCapacity = arr[i].capacity;
+            largestTruckIndex = i;
+        }
+    }
+    
+    return largestTruckIndex;
+}
